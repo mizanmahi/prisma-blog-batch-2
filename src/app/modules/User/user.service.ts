@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { searchableFields } from './user.constant';
 
 const prisma = new PrismaClient();
 
@@ -12,7 +13,7 @@ const createUser = async (data: any) => {
    return createdUserData;
 };
 
-const getUsersFromDB = async (queryParams: any) => {
+const getUsersFromDB = async (queryParams: any, paginationParams: any) => {
    /* 
    //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
    return await prisma.user.findMany({
@@ -26,10 +27,11 @@ const getUsersFromDB = async (queryParams: any) => {
    */
 
    const { q, ...otherQueryParams } = queryParams;
+   const { page, limit } = paginationParams;
+
+   console.log(page, limit);
 
    const conditions: Prisma.UserWhereInput[] = [];
-
-   const searchableFields = ['username', 'email'];
 
    //@ for searching on multiple fields
    // if (queryParams.q) {
@@ -60,6 +62,8 @@ const getUsersFromDB = async (queryParams: any) => {
 
    return await prisma.user.findMany({
       where: { AND: conditions },
+      skip: (page - 1) * limit,
+      take: Number(limit),
    });
 };
 

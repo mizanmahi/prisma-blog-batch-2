@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { userService } from './user.service';
 import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
+import { paginationParams, validParams } from './user.constant';
 
 const createUser = async (req: Request, res: Response) => {
    const result = await userService.createUser(req.body);
@@ -10,18 +11,23 @@ const createUser = async (req: Request, res: Response) => {
    });
 };
 const getUsers = async (req: Request, res: Response) => {
-   const validParams = ['q', 'email'];
    const validQueryParams = filterValidQueryParams(req.query, validParams);
-
-   console.log(validParams);
+   const paginationQueryParams = filterValidQueryParams(
+      req.query,
+      paginationParams
+   );
 
    try {
-      const result = await userService.getUsersFromDB(validQueryParams);
+      const result = await userService.getUsersFromDB(
+         validQueryParams,
+         paginationQueryParams
+      );
       res.json({
          success: true,
          data: result,
       });
    } catch (error) {
+      console.log(error);
       res.status(500).json({
          success: false,
          data: error,
