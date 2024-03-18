@@ -11,6 +11,7 @@ const createUser = async (data: any) => {
    });
    return createdUserData;
 };
+
 const getUsersFromDB = async (queryParams: any) => {
    /* 
    //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
@@ -31,14 +32,22 @@ const getUsersFromDB = async (queryParams: any) => {
    const searchableFields = ['username', 'email'];
 
    //@ for searching on multiple fields
-   if (queryParams.q) {
-      conditions.push({
-         OR: searchableFields.map((field) => ({
-            [field]: {
-               contains: queryParams.q,
-            },
-         })),
-      });
+   // if (queryParams.q) {
+   //    conditions.push({
+   //       OR: searchableFields.map((field) => ({
+   //          [field]: {
+   //             contains: queryParams.q,
+   //          },
+   //       })),
+   //    });
+   // }
+
+   // ! refactored
+   if (q) {
+      const searchConditions = searchableFields.map((field) => ({
+         [field]: { contains: q },
+      }));
+      conditions.push({ OR: searchConditions });
    }
 
    //@ filtering with exact value
@@ -48,8 +57,6 @@ const getUsersFromDB = async (queryParams: any) => {
       }));
       conditions.push(...filterData);
    }
-
-   // console.log(conditions);
 
    return await prisma.user.findMany({
       where: { AND: conditions },

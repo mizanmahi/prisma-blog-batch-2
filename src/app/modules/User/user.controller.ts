@@ -13,6 +13,8 @@ const getUsers = async (req: Request, res: Response) => {
    const validParams = ['q', 'email'];
    const validQueryParams = filterValidQueryParams(req.query, validParams);
 
+   console.log(validParams);
+
    try {
       const result = await userService.getUsersFromDB(validQueryParams);
       res.json({
