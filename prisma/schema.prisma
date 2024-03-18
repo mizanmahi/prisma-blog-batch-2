@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// enums
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+model User {
+  id       String    @id @default(uuid())
+  username String
+  email    String    @unique
+  password String
+  isActive Boolean   @default(true)
+  blogs    Blog[]
+  Comment  Comment[]
+
+  @@map("user")
+}
+
+model Blog {
+  id         String     @id @default(uuid())
+  title      String
+  content    String
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id])
+  visibility Visibility @default(PUBLIC)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comment    Comment[]
+
+  @@map("blog")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  blogId    String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comment")
+}
