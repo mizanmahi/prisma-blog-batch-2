@@ -4,6 +4,14 @@ import { searchableFields } from './user.constant';
 
 const prisma = new PrismaClient();
 
+const createOrderBy = (sortingParams: {
+   sortBy: string;
+   sortOrder: 'asc' | 'desc';
+}): Prisma.UserOrderByWithRelationAndSearchRelevanceInput => {
+   const { sortBy, sortOrder } = sortingParams;
+   return sortBy && sortOrder ? { [sortBy]: sortOrder } : { createdAt: 'desc' };
+};
+
 const createUser = async (data: any) => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -18,36 +26,12 @@ const getUsersFromDB = async (
    paginationParams: any,
    sortingParams: any
 ) => {
-   /* 
-   //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
-   return await prisma.user.findMany({
-      where: {
-         username: {
-            search: queryParams.q,
-         },
-      },
-      select: { id: true, username: true, email: true, isActive: true },
-   }); 
-   */
-
    const { q, ...otherQueryParams } = queryParams;
    const { page = 1, limit = 2 } = paginationParams;
-   const { sortBy, sortOrder } = sortingParams;
+   const orderBy = createOrderBy(sortingParams);
 
    const conditions: Prisma.UserWhereInput[] = [];
 
-   //@ for searching on multiple fields
-   // if (queryParams.q) {
-   //    conditions.push({
-   //       OR: searchableFields.map((field) => ({
-   //          [field]: {
-   //             contains: queryParams.q,
-   //          },
-   //       })),
-   //    });
-   // }
-
-   // ! refactored
    if (q) {
       const searchConditions = searchableFields.map((field) => ({
          [field]: { contains: q },
@@ -64,12 +48,10 @@ const getUsersFromDB = async (
    }
 
    //@ sorting
-   const orderBy: Prisma.UserOrderByWithRelationAndSearchRelevanceInput =
-      sortBy && sortOrder ? { [sortBy]: sortOrder } : { createdAt: 'desc' };
 
    return await prisma.user.findMany({
       where: { AND: conditions },
-      skip: (page - 1) * limit,
+      skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
       orderBy,
    });
