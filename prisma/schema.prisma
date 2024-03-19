@@ -21,13 +21,15 @@ enum Visibility {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  username String
-  email    String    @unique
-  password String
-  isActive Boolean   @default(true)
-  blogs    Blog[]
-  Comment  Comment[]
+  id        String    @id @default(uuid())
+  username  String
+  email     String    @unique
+  password  String
+  isActive  Boolean   @default(true)
+  blogs     Blog[]
+  Comment   Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("user")
 }

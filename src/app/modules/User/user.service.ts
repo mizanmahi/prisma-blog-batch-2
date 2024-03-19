@@ -13,7 +13,11 @@ const createUser = async (data: any) => {
    return createdUserData;
 };
 
-const getUsersFromDB = async (queryParams: any, paginationParams: any) => {
+const getUsersFromDB = async (
+   queryParams: any,
+   paginationParams: any,
+   sortingParams: any
+) => {
    /* 
    //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
    return await prisma.user.findMany({
@@ -27,9 +31,8 @@ const getUsersFromDB = async (queryParams: any, paginationParams: any) => {
    */
 
    const { q, ...otherQueryParams } = queryParams;
-   const { page, limit } = paginationParams;
-
-   console.log(page, limit);
+   const { page = 1, limit = 2 } = paginationParams;
+   const { sortBy, sortOrder } = sortingParams;
 
    const conditions: Prisma.UserWhereInput[] = [];
 
@@ -60,10 +63,15 @@ const getUsersFromDB = async (queryParams: any, paginationParams: any) => {
       conditions.push(...filterData);
    }
 
+   //@ sorting
+   const orderBy: Prisma.UserOrderByWithRelationAndSearchRelevanceInput =
+      sortBy && sortOrder ? { [sortBy]: sortOrder } : { createdAt: 'desc' };
+
    return await prisma.user.findMany({
       where: { AND: conditions },
       skip: (page - 1) * limit,
       take: Number(limit),
+      orderBy,
    });
 };
 

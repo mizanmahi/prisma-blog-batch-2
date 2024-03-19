@@ -16,11 +16,16 @@ const getUsers = async (req: Request, res: Response) => {
       req.query,
       paginationParams
    );
+   const sortingQueryParams = filterValidQueryParams(req.query, [
+      'sortBy',
+      'sortOrder',
+   ]);
 
    try {
       const result = await userService.getUsersFromDB(
          validQueryParams,
-         paginationQueryParams
+         paginationQueryParams,
+         sortingQueryParams
       );
       res.json({
          success: true,
