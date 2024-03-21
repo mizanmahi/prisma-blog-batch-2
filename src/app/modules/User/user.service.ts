@@ -1,7 +1,8 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { searchableFields } from './user.constant';
+import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
+import prisma from '../../../shared/prismaClient';
 
 const createUser = async (data: any) => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -12,37 +13,22 @@ const createUser = async (data: any) => {
    return createdUserData;
 };
 
-const getUsersFromDB = async (queryParams: any) => {
-   /* 
-   //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
-   return await prisma.user.findMany({
-      where: {
-         username: {
-            search: queryParams.q,
-         },
-      },
-      select: { id: true, username: true, email: true, isActive: true },
-   }); 
-   */
-
+const getUsersFromDB = async (
+   queryParams: any,
+   paginationParams: any,
+   sortingParams: any
+) => {
    const { q, ...otherQueryParams } = queryParams;
+
+   const { limit, skip, page, sortBy, sortOrder } =
+      generatePaginateAndSortOptions({
+         ...paginationParams,
+         ...sortingParams,
+      });
 
    const conditions: Prisma.UserWhereInput[] = [];
 
-   const searchableFields = ['username', 'email'];
-
-   //@ for searching on multiple fields
-   // if (queryParams.q) {
-   //    conditions.push({
-   //       OR: searchableFields.map((field) => ({
-   //          [field]: {
-   //             contains: queryParams.q,
-   //          },
-   //       })),
-   //    });
-   // }
-
-   // ! refactored
+   //@ searching
    if (q) {
       const searchConditions = searchableFields.map((field) => ({
          [field]: { contains: q },
@@ -58,12 +44,53 @@ const getUsersFromDB = async (queryParams: any) => {
       conditions.push(...filterData);
    }
 
-   return await prisma.user.findMany({
+   const result = await prisma.user.findMany({
+      where: { AND: conditions },
+      skip,
+      take: limit,
+      orderBy: {
+         [sortBy]: sortOrder,
+      },
+   });
+
+   const count = await prisma.user.count({
       where: { AND: conditions },
    });
+
+   return {
+      meta: {
+         page,
+         limit,
+         count,
+      },
+      result,
+   };
+};
+
+const getSingleUserFromDB = async (userId: string) => {
+   const user = await prisma.user.findUnique({
+      where: {
+         id: userId,
+      },
+   });
+
+   return user;
+};
+
+const updateUserIntoDB = async (userId: string, updatedData: any) => {
+   const user = await prisma.user.update({
+      where: {
+         id: userId,
+      },
+      data: updatedData,
+   });
+
+   return user;
 };
 
 export const userService = {
    createUser,
    getUsersFromDB,
+   getSingleUserFromDB,
+   updateUserIntoDB,
 };
