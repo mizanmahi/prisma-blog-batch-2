@@ -10,6 +10,7 @@ const createUser = async (req: Request, res: Response) => {
       data: result,
    });
 };
+
 const getUsers = async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);
    const paginationQueryParams = filterValidQueryParams(
@@ -27,9 +28,11 @@ const getUsers = async (req: Request, res: Response) => {
          paginationQueryParams,
          sortingQueryParams
       );
-      res.json({
+      res.status(200).json({
          success: true,
-         data: result,
+         message: 'Users fetched successfully',
+         meta: result.meta,
+         data: result.result,
       });
    } catch (error) {
       console.log(error);
@@ -40,7 +43,31 @@ const getUsers = async (req: Request, res: Response) => {
    }
 };
 
+const getSingleUser = async (req: Request, res: Response) => {
+   const result = await userService.getSingleUserFromDB(req.params.userId);
+   res.json({
+      success: true,
+      message: 'User fetched successfully',
+      data: result,
+   });
+};
+const updateUser = async (req: Request, res: Response) => {
+   const { userId } = req.params;
+
+   const result = await userService.updateUserIntoDB(
+      req.params.userId,
+      req.body
+   );
+   res.json({
+      success: true,
+      message: 'User updated successfully',
+      data: result,
+   });
+};
+
 export const userController = {
    createUser,
    getUsers,
+   getSingleUser,
+   updateUser,
 };

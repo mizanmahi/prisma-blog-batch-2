@@ -1,16 +1,8 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { searchableFields } from './user.constant';
-
-const prisma = new PrismaClient();
-
-const createOrderBy = (sortingParams: {
-   sortBy: string;
-   sortOrder: 'asc' | 'desc';
-}): Prisma.UserOrderByWithRelationAndSearchRelevanceInput => {
-   const { sortBy, sortOrder } = sortingParams;
-   return sortBy && sortOrder ? { [sortBy]: sortOrder } : { createdAt: 'desc' };
-};
+import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
+import prisma from '../../../shared/prismaClient';
 
 const createUser = async (data: any) => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -27,11 +19,16 @@ const getUsersFromDB = async (
    sortingParams: any
 ) => {
    const { q, ...otherQueryParams } = queryParams;
-   const { page = 1, limit = 2 } = paginationParams;
-   const orderBy = createOrderBy(sortingParams);
+
+   const { limit, skip, page, sortBy, sortOrder } =
+      generatePaginateAndSortOptions({
+         ...paginationParams,
+         ...sortingParams,
+      });
 
    const conditions: Prisma.UserWhereInput[] = [];
 
+   //@ searching
    if (q) {
       const searchConditions = searchableFields.map((field) => ({
          [field]: { contains: q },
@@ -47,17 +44,53 @@ const getUsersFromDB = async (
       conditions.push(...filterData);
    }
 
-   //@ sorting
-
-   return await prisma.user.findMany({
+   const result = await prisma.user.findMany({
       where: { AND: conditions },
-      skip: (Number(page) - 1) * Number(limit),
-      take: Number(limit),
-      orderBy,
+      skip,
+      take: limit,
+      orderBy: {
+         [sortBy]: sortOrder,
+      },
    });
+
+   const count = await prisma.user.count({
+      where: { AND: conditions },
+   });
+
+   return {
+      meta: {
+         page,
+         limit,
+         count,
+      },
+      result,
+   };
+};
+
+const getSingleUserFromDB = async (userId: string) => {
+   const user = await prisma.user.findUnique({
+      where: {
+         id: userId,
+      },
+   });
+
+   return user;
+};
+
+const updateUserIntoDB = async (userId: string, updatedData: any) => {
+   const user = await prisma.user.update({
+      where: {
+         id: userId,
+      },
+      data: updatedData,
+   });
+
+   return user;
 };
 
 export const userService = {
    createUser,
    getUsersFromDB,
+   getSingleUserFromDB,
+   updateUserIntoDB,
 };
