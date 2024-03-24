@@ -4,18 +4,9 @@ import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
 import { paginationParams, validParams } from './user.constant';
 import { sendResponse } from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
+import catchAsync from '../../../shared/catchAsync';
 
-const catchAsync = (controller: RequestHandler) => {
-   return async (req: Request, res: Response, next: NextFunction) => {
-      try {
-         await controller(req, res, next);
-      } catch (error) {
-         next(error);
-      }
-   };
-};
-
-const createUser = catchAsync(async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response) => {
    const result = await userService.createUser(req.body);
    sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -23,7 +14,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
       message: 'User Created Successfully!',
       data: result,
    });
-});
+};
 
 const getUsers = catchAsync(async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);

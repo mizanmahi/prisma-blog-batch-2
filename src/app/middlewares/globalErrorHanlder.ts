@@ -10,8 +10,8 @@ const globalErrorHandler = (
    console.dir('came to global error handler');
    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: err.name || 'Something went wrong',
-      error: err.message,
+      message: err.message || 'Something went wrong',
+      error: err,
    });
 };
 
