@@ -3,6 +3,11 @@ import bcrypt from 'bcrypt';
 import { searchableFields } from './user.constant';
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import prisma from '../../../shared/prismaClient';
+import {
+   IUserFilterParams,
+   IUserPaginationParams,
+   IUserSortingParams,
+} from './user.interface';
 
 const createUser = async (data: any): Promise<User> => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -14,9 +19,9 @@ const createUser = async (data: any): Promise<User> => {
 };
 
 const getUsersFromDB = async (
-   queryParams: any,
-   paginationParams: any,
-   sortingParams: any
+   queryParams: IUserFilterParams,
+   paginationParams: IUserPaginationParams,
+   sortingParams: IUserSortingParams
 ) => {
    const { q, ...otherQueryParams } = queryParams;
 
@@ -44,7 +49,7 @@ const getUsersFromDB = async (
    //@ filtering with exact value
    if (Object.keys(otherQueryParams).length > 0) {
       const filterData = Object.keys(otherQueryParams).map((key) => ({
-         [key]: otherQueryParams[key],
+         [key]: (otherQueryParams as any)[key],
       }));
       conditions.push(...filterData);
    }
@@ -58,7 +63,7 @@ const getUsersFromDB = async (
       },
    });
 
-   const count = await prisma.user.count({
+   const total = await prisma.user.count({
       where: { AND: conditions },
    });
 
@@ -66,7 +71,7 @@ const getUsersFromDB = async (
       meta: {
          page,
          limit,
-         count,
+         total,
       },
       result,
    };

@@ -1,17 +1,22 @@
 type IOptions = {
-   page?: number;
-   limit?: number;
+   page?: string;
+   limit?: string;
    sortOrder?: string;
-   sortBy: string;
+   sortBy?: string;
 };
 
-type IOptionsResult = IOptions & {
+type IOptionsResult = {
    skip: number;
+   page: number;
+   limit: number;
+   sortOrder: string;
+   sortBy: string;
 };
 
 export const generatePaginateAndSortOptions = (
    paginateAndSortOptions: IOptions
 ): IOptionsResult => {
+   console.log({ paginateAndSortOptions });
    const page: number = Number(paginateAndSortOptions.page) || 1;
    const limit: number = Number(paginateAndSortOptions.limit) || 10;
    const skip: number = (Number(page) - 1) * limit;
