@@ -1,22 +1,31 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { userService } from './user.service';
 import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
 import { paginationParams, validParams } from './user.constant';
 import { sendResponse } from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 
-const createUser = async (req: Request, res: Response) => {
-   const result = await userService.createUser(req.body);
+const catchAsync = (controller: RequestHandler) => {
+   return async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         await controller(req, res, next);
+      } catch (error) {
+         next(error);
+      }
+   };
+};
 
+const createUser = catchAsync(async (req: Request, res: Response) => {
+   const result = await userService.createUser(req.body);
    sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
       message: 'User Created Successfully!',
       data: result,
    });
-};
+});
 
-const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+const getUsers = catchAsync(async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);
    const paginationQueryParams = filterValidQueryParams(
       req.query,
@@ -27,27 +36,22 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
       'sortOrder',
    ]);
 
-   try {
-      throw new Error('generated error');
-      const result = await userService.getUsersFromDB(
-         validQueryParams,
-         paginationQueryParams,
-         sortingQueryParams
-      );
+   const result = await userService.getUsersFromDB(
+      validQueryParams,
+      paginationQueryParams,
+      sortingQueryParams
+   );
 
-      sendResponse(res, {
-         statusCode: httpStatus.OK,
-         success: true,
-         message: 'User Fetched Successfully!',
-         meta: result.meta,
-         data: result.result,
-      });
-   } catch (error) {
-      next(error);
-   }
-};
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User Fetched Successfully!',
+      meta: result.meta,
+      data: result.result,
+   });
+});
 
-const getSingleUser = async (req: Request, res: Response) => {
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
    const result = await userService.getSingleUserFromDB(req.params.userId);
 
    sendResponse(res, {
@@ -56,67 +60,45 @@ const getSingleUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully',
       data: result,
    });
-};
+});
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = catchAsync(async (req: Request, res: Response) => {
    const { userId } = req.params;
 
-   try {
-      const result = await userService.updateUserIntoDB(userId, req.body);
+   const result = await userService.updateUserIntoDB(userId, req.body);
 
-      sendResponse(res, {
-         statusCode: httpStatus.OK,
-         success: true,
-         message: 'User updated successfully',
-         data: result,
-      });
-   } catch (error) {
-      res.status(500).json({
-         success: false,
-         data: error,
-      });
-   }
-};
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User updated successfully',
+      data: result,
+   });
+});
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
    const { userId } = req.params;
 
-   try {
-      const result = await userService.deleteFromDB(userId);
+   const result = await userService.deleteFromDB(userId);
 
-      sendResponse(res, {
-         statusCode: httpStatus.OK,
-         success: true,
-         message: 'User deleted successfully',
-         data: result,
-      });
-   } catch (error) {
-      res.status(500).json({
-         success: false,
-         data: error,
-      });
-   }
-};
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User deleted successfully',
+      data: result,
+   });
+});
 
-const softDeleteUser = async (req: Request, res: Response) => {
+const softDeleteUser = catchAsync(async (req: Request, res: Response) => {
    const { userId } = req.params;
+   const result = await userService.softDeleteFromDB(userId);
 
-   try {
-      const result = await userService.softDeleteFromDB(userId);
-
-      sendResponse(res, {
-         statusCode: 200,
-         success: true,
-         message: 'User deleted successfully',
-         data: result,
-      });
-   } catch (error) {
-      res.status(500).json({
-         success: false,
-         data: error,
-      });
-   }
-};
+   sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'User deleted successfully',
+      data: result,
+   });
+});
 
 export const userController = {
    createUser,
