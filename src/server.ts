@@ -1,13 +1,13 @@
 import { Server } from 'http';
 import app from './app';
+import config from './config/config';
 
-const PORT = 5000;
 let server: Server;
 
 async function main() {
-   server = app.listen(PORT, () => {
+   server = app.listen(config.port, () => {
       console.log(
-         `🚀 Server ready at: http://localhost:${PORT} and the process id is ${process.pid}`
+         `🚀 Server ready at: http://localhost:${config.port} and the process id is ${process.pid}`
       );
    });
 }

@@ -1,7 +1,8 @@
 import prisma from '../../../shared/prismaClient';
 import * as bcrypt from 'bcrypt';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import { jwtHelpers } from '../../../helpers/jwtHelper';
+import config from '../../../config/config';
+import { Secret } from 'jsonwebtoken';
 
 const loginUser = async (payload: { email: string; password: string }) => {
    // checking if a user with this email exist
@@ -24,13 +25,13 @@ const loginUser = async (payload: { email: string; password: string }) => {
 
    const accessToken = jwtHelpers.generateToken(
       { email: payload.email },
-      'secret',
-      '10m'
+      config.jwt.jwtSecret as Secret,
+      config.jwt.expiresIn
    );
    const refreshToken = jwtHelpers.generateToken(
       { email: payload.email },
-      'refreshSecret',
-      '30m'
+      config.jwt.refreshTokenSecret as Secret,
+      config.jwt.refreshTokenExpiresIn
    );
 
    console.log(accessToken);
@@ -40,6 +41,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
       refreshToken,
    };
 };
+
 const refreshToken = async (token: string) => {
    let decodedData;
    try {
@@ -59,8 +61,8 @@ const refreshToken = async (token: string) => {
    // generating new token
    const accessToken = jwtHelpers.generateToken(
       { email: decodedData.email },
-      'secret',
-      '10m'
+      config.jwt.jwtSecret as Secret,
+      config.jwt.expiresIn
    );
 
    return {
