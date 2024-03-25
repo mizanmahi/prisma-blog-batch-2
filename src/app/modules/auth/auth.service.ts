@@ -24,12 +24,12 @@ const loginUser = async (payload: { email: string; password: string }) => {
    const accessToken = jwtHelpers.generateToken(
       { email: payload.email },
       'secret',
-      '5m'
+      '10m'
    );
    const refreshToken = jwtHelpers.generateToken(
       { email: payload.email },
       'refreshSecret',
-      '5m'
+      '30m'
    );
 
    console.log(accessToken);
@@ -39,7 +39,34 @@ const loginUser = async (payload: { email: string; password: string }) => {
       refreshToken,
    };
 };
+const refreshToken = async (token: string) => {
+   let decodedData;
+   try {
+      decodedData = jwt.verify(token, 'refreshSecret');
+   } catch (error) {
+      throw new Error('You are not authorized');
+   }
+
+   // checking if user exist
+   const ifUserExist = await prisma.user.findUniqueOrThrow({
+      where: {
+         email: decodedData?.email,
+      },
+   });
+
+   // generating new token
+   const accessToken = jwtHelpers.generateToken(
+      { email: decodedData.email },
+      'secret',
+      '10m'
+   );
+
+   return {
+      accessToken,
+   };
+};
 
 export const authService = {
    loginUser,
+   refreshToken,
 };
