@@ -1,7 +1,34 @@
-const loginUser = async (payload: { username: string; password: string }) => {
-   console.log('logging in', payload);
+import prisma from '../../../shared/prismaClient';
+import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+const loginUser = async (payload: { email: string; password: string }) => {
+   // checking if a user with this email exist
+   const userData = await prisma.user.findUniqueOrThrow({
+      where: {
+         email: payload.email,
+      },
+   });
+
+   // check if the provided password is correct
+   const isCorrectPassword: boolean = await bcrypt.compare(
+      payload.password,
+      userData.password
+   );
+
+   if (!isCorrectPassword) {
+      throw new Error('Incorrect password');
+   }
+
+   const accessToken = jwt.sign({ email: payload.email }, 'secret', {
+      algorithm: 'HS256', // based on this you might need to change the secret key, so choose it wisely
+      expiresIn: '15m',
+   });
+
+   console.log(accessToken);
+
    return {
-      token: 'random token id',
+      accessToken,
    };
 };
 

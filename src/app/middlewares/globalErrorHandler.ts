@@ -7,7 +7,7 @@ const globalErrorHandler = (
    res: Response,
    next: NextFunction
 ) => {
-   console.dir('came to global error handler');
+   console.dir('came to global error handler', err);
    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: err.message || 'Something went wrong',
