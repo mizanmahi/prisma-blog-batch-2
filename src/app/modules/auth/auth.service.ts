@@ -22,13 +22,18 @@ const loginUser = async (payload: { email: string; password: string }) => {
 
    const accessToken = jwt.sign({ email: payload.email }, 'secret', {
       algorithm: 'HS256', // based on this you might need to change the secret key, so choose it wisely
-      expiresIn: '15m',
+      expiresIn: '5m',
+   });
+   const refreshToken = jwt.sign({ email: payload.email }, 'secret', {
+      algorithm: 'HS256', // based on this you might need to change the secret key, so choose it wisely
+      expiresIn: '15d',
    });
 
    console.log(accessToken);
 
    return {
       accessToken,
+      refreshToken,
    };
 };
 
