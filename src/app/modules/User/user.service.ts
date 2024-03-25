@@ -14,7 +14,7 @@ const createUser = async (data: any) => {
 
 const getUsersFromDB = async (queryParams: any) => {
    /* 
-   //!using full text search, won't work for multiple field as need rw sql for that (unsupported database features)
+   //!using full text search, won't work for multiple field as need raw sql for that (unsupported database features)
    return await prisma.user.findMany({
       where: {
          username: {
