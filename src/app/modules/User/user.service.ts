@@ -3,11 +3,11 @@ import bcrypt from 'bcrypt';
 import { searchableFields } from './user.constant';
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import prisma from '../../../shared/prismaClient';
+import { IUserFilterParams } from './user.interface';
 import {
-   IUserFilterParams,
-   IUserPaginationParams,
-   IUserSortingParams,
-} from './user.interface';
+   IPaginationParams,
+   ISortingParams,
+} from '../../interfaces/paginationSorting';
 
 const createUser = async (data: any): Promise<User> => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -20,8 +20,8 @@ const createUser = async (data: any): Promise<User> => {
 
 const getUsersFromDB = async (
    queryParams: IUserFilterParams,
-   paginationParams: IUserPaginationParams,
-   sortingParams: IUserSortingParams
+   paginationParams: IPaginationParams,
+   sortingParams: ISortingParams
 ) => {
    const { q, ...otherQueryParams } = queryParams;
 

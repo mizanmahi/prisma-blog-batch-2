@@ -6,7 +6,7 @@ import { sendResponse } from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = catchAsync(async (req: Request, res: Response) => {
    const result = await userService.createUser(req.body);
    sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -14,7 +14,7 @@ const createUser = async (req: Request, res: Response) => {
       message: 'User Created Successfully!',
       data: result,
    });
-};
+});
 
 const getUsers = catchAsync(async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);
