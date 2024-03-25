@@ -24,12 +24,12 @@ const loginUser = async (payload: { email: string; password: string }) => {
    }
 
    const accessToken = jwtHelpers.generateToken(
-      { email: payload.email },
+      { email: payload.email, userId: userData.id },
       config.jwt.jwtSecret as Secret,
       config.jwt.expiresIn
    );
    const refreshToken = jwtHelpers.generateToken(
-      { email: payload.email },
+      { email: payload.email, userId: userData.id },
       config.jwt.refreshTokenSecret as Secret,
       config.jwt.refreshTokenExpiresIn
    );
@@ -51,7 +51,7 @@ const refreshToken = async (token: string) => {
    }
 
    // checking if user exist and throw if not
-   await prisma.user.findUniqueOrThrow({
+   const userData = await prisma.user.findUniqueOrThrow({
       where: {
          email: decodedData.email,
          isDelete: false,
@@ -60,7 +60,7 @@ const refreshToken = async (token: string) => {
 
    // generating new token
    const accessToken = jwtHelpers.generateToken(
-      { email: decodedData.email },
+      { email: decodedData.email, userId: userData.id },
       config.jwt.jwtSecret as Secret,
       config.jwt.expiresIn
    );
