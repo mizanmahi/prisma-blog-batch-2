@@ -1,10 +1,15 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { searchableFields } from './user.constant';
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import prisma from '../../../shared/prismaClient';
+import { IUserFilterParams } from './user.interface';
+import {
+   IPaginationParams,
+   ISortingParams,
+} from '../../interfaces/paginationSorting';
 
-const createUser = async (data: any) => {
+const createUser = async (data: any): Promise<User> => {
    const hashedPassword = await bcrypt.hash(data.password, 10);
 
    const createdUserData = await prisma.user.create({
@@ -14,9 +19,9 @@ const createUser = async (data: any) => {
 };
 
 const getUsersFromDB = async (
-   queryParams: any,
-   paginationParams: any,
-   sortingParams: any
+   queryParams: IUserFilterParams,
+   paginationParams: IPaginationParams,
+   sortingParams: ISortingParams
 ) => {
    const { q, ...otherQueryParams } = queryParams;
 
@@ -27,6 +32,11 @@ const getUsersFromDB = async (
       });
 
    const conditions: Prisma.UserWhereInput[] = [];
+
+   // filtering out the soft deleted users
+   conditions.push({
+      isDelete: false,
+   });
 
    //@ searching
    if (q) {
@@ -39,7 +49,7 @@ const getUsersFromDB = async (
    //@ filtering with exact value
    if (Object.keys(otherQueryParams).length > 0) {
       const filterData = Object.keys(otherQueryParams).map((key) => ({
-         [key]: otherQueryParams[key],
+         [key]: (otherQueryParams as any)[key],
       }));
       conditions.push(...filterData);
    }
@@ -53,7 +63,7 @@ const getUsersFromDB = async (
       },
    });
 
-   const count = await prisma.user.count({
+   const total = await prisma.user.count({
       where: { AND: conditions },
    });
 
@@ -61,23 +71,34 @@ const getUsersFromDB = async (
       meta: {
          page,
          limit,
-         count,
+         total,
       },
       result,
    };
 };
 
-const getSingleUserFromDB = async (userId: string) => {
-   const user = await prisma.user.findUnique({
+const getSingleUserFromDB = async (userId: string): Promise<User> => {
+   const user = await prisma.user.findUniqueOrThrow({
       where: {
          id: userId,
+         isDelete: false,
       },
    });
 
    return user;
 };
 
-const updateUserIntoDB = async (userId: string, updatedData: any) => {
+const updateUserIntoDB = async (
+   userId: string,
+   updatedData: Partial<User>
+): Promise<User> => {
+   await prisma.user.findUniqueOrThrow({
+      where: {
+         id: userId,
+         isDelete: false,
+      },
+   });
+
    const user = await prisma.user.update({
       where: {
          id: userId,
@@ -88,9 +109,47 @@ const updateUserIntoDB = async (userId: string, updatedData: any) => {
    return user;
 };
 
+const deleteFromDB = async (userId: string): Promise<User> => {
+   await prisma.user.findUniqueOrThrow({
+      where: {
+         id: userId,
+      },
+   });
+
+   const deleteUser = await prisma.user.delete({
+      where: {
+         id: userId,
+      },
+   });
+
+   return deleteUser;
+};
+
+const softDeleteFromDB = async (userId: string): Promise<User> => {
+   await prisma.user.findUniqueOrThrow({
+      where: {
+         id: userId,
+         isDelete: false,
+      },
+   });
+
+   const user = await prisma.user.update({
+      where: {
+         id: userId,
+      },
+      data: {
+         isDelete: true,
+      },
+   });
+
+   return user;
+};
+
 export const userService = {
    createUser,
    getUsersFromDB,
    getSingleUserFromDB,
    updateUserIntoDB,
+   deleteFromDB,
+   softDeleteFromDB,
 };

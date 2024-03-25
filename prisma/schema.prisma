@@ -28,6 +28,7 @@ model User {
   isActive  Boolean   @default(true)
   blogs     Blog[]
   Comment   Comment[]
+  isDelete  Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
