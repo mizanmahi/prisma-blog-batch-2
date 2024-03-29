@@ -47,10 +47,30 @@ const getUsersFromDB = async (
    }
 
    //@ filtering with exact value
+   // if (Object.keys(otherQueryParams).length > 0) {
+   //    const filterData = Object.keys(otherQueryParams).map((key) => ({
+   //       [key]: (otherQueryParams as any)[key],
+   //    }));
+   //    conditions.push(...filterData);
+   // }
+
    if (Object.keys(otherQueryParams).length > 0) {
-      const filterData = Object.keys(otherQueryParams).map((key) => ({
-         [key]: (otherQueryParams as any)[key],
-      }));
+      const filterData: any[] = [];
+
+      for (const key of Object.keys(otherQueryParams)) {
+         let value = (otherQueryParams as any)[key];
+
+         if (value === 'true' || value === 'false') {
+            value = value === 'true'; // Convert 'true' to true, 'false' to false
+         }
+
+         // Construct filter object
+         const filterObject: any = {};
+         filterObject[key] = value;
+         filterData.push(filterObject);
+      }
+
+      // Push all filters to conditions array
       conditions.push(...filterData);
    }
 
