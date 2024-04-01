@@ -16,7 +16,6 @@ type IOptionsResult = {
 export const generatePaginateAndSortOptions = (
    paginateAndSortOptions: IOptions
 ): IOptionsResult => {
-   console.log({ paginateAndSortOptions });
    const page: number = Number(paginateAndSortOptions.page) || 1;
    const limit: number = Number(paginateAndSortOptions.limit) || 10;
    const skip: number = (Number(page) - 1) * limit;
