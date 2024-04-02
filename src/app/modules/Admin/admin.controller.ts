@@ -4,7 +4,8 @@ import httpStatus from 'http-status';
 import { AdminService } from './admin.service';
 import catchAsync from '../../../shared/catchAsync';
 import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
-import { paginationAndSortingParams, validParams } from './admin.constants';
+import { validParams } from './admin.constants';
+import { paginationAndSortingParams } from '../../../shared/appConstants';
 
 const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);
