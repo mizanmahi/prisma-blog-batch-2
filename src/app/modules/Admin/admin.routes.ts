@@ -3,16 +3,13 @@ import { AdminController } from './admin.controller';
 
 const router = express.Router();
 
-router.get('/', AdminController.getAllFromDB);
+router.get('/', AdminController.getAllAdmin);
 
-// router.get('/:id', AdminController.getByIdFromDB);
+router.get('/:id', AdminController.getSingleAdmin);
 
-// router.patch(
-//     '/:id',
-//     AdminController.updateIntoDB
-// );
+router.patch('/:id', AdminController.updateAdmin);
 
-// router.delete('/:id', AdminController.deleteFromDB);
+router.delete('/:id', AdminController.deleteAdmin);
 
 // router.delete('/soft/:id', AdminController.softDeleteFromDB);
 

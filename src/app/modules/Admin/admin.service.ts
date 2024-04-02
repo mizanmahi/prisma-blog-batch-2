@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Admin, Prisma } from '@prisma/client';
 import prisma from '../../../shared/prismaClient';
 import {
    IPaginationParams,
@@ -8,7 +8,7 @@ import { IUserFilterParams } from '../User/user.interface';
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import { searchableFields } from './admin.constants';
 
-const getAllFromDB = async (
+const getAllAdminFomDB = async (
    queryParams: IUserFilterParams,
    paginationAndSortingQueryParams: IPaginationParams & ISortingParams
 ) => {
@@ -65,6 +65,80 @@ const getAllFromDB = async (
    };
 };
 
+const getSingleAdminFromDB = async (id: string) => {
+   return await prisma.admin.findUniqueOrThrow({
+      where: {
+         id,
+         isDeleted: false,
+      },
+   });
+};
+
+const updateAdminIntoDB = async (
+   id: string,
+   data: Partial<Admin>
+): Promise<Admin> => {
+   await prisma.admin.findUniqueOrThrow({
+      where: {
+         id,
+         isDeleted: false,
+      },
+   });
+
+   return await prisma.admin.update({
+      where: {
+         id,
+      },
+      data,
+   });
+};
+const deleteAdminFromDB = async (id: string): Promise<Admin> => {
+   await prisma.admin.findUniqueOrThrow({
+      where: {
+         id,
+         isDeleted: false,
+      },
+   });
+
+   return await prisma.$transaction(async (trClient) => {
+      const deletedAdmin = await trClient.admin.delete({
+         where: {
+            id,
+         },
+      });
+
+      await trClient.user.delete({
+         where: {
+            email: deletedAdmin.email,
+         },
+      });
+
+      return deletedAdmin;
+   });
+};
+
+const softDeleteAdminFromDB = async (id: string): Promise<Admin> => {
+   await prisma.admin.findUniqueOrThrow({
+      where: {
+         id,
+         isDeleted: false,
+      },
+   });
+
+   return await prisma.admin.update({
+      where: {
+         id,
+      },
+      data: {
+         isDeleted: true,
+      },
+   });
+};
+
 export const AdminService = {
-   getAllFromDB,
+   getAllAdminFomDB,
+   getSingleAdminFromDB,
+   updateAdminIntoDB,
+   deleteAdminFromDB,
+   softDeleteAdminFromDB,
 };

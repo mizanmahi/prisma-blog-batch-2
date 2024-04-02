@@ -6,14 +6,14 @@ import catchAsync from '../../../shared/catchAsync';
 import { filterValidQueryParams } from '../../../shared/filterValidQueryParams';
 import { paginationAndSortingParams, validParams } from './admin.constants';
 
-const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
    const validQueryParams = filterValidQueryParams(req.query, validParams);
    const paginationAndSortingQueryParams = filterValidQueryParams(
       req.query,
       paginationAndSortingParams
    );
 
-   const result = await AdminService.getAllFromDB(
+   const result = await AdminService.getAllAdminFomDB(
       validQueryParams,
       paginationAndSortingQueryParams
    );
@@ -27,6 +27,45 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
    });
 });
 
+const getSingleAdmin = catchAsync(async (req: Request, res: Response) => {
+   const { id } = req.params;
+
+   const result = await AdminService.getSingleAdminFromDB(id);
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Admin data fetched successfully!',
+      data: result,
+   });
+});
+
+const updateAdmin = catchAsync(async (req: Request, res: Response) => {
+   const { id } = req.params;
+
+   const result = await AdminService.updateAdminIntoDB(id, req.body);
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Admin data updated successfully!',
+      data: result,
+   });
+});
+
+const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
+   const { id } = req.params;
+
+   const result = await AdminService.deleteAdminFromDB(id);
+   sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Admin data deleted successfully!',
+      data: result,
+   });
+});
+
 export const AdminController = {
-   getAllFromDB,
+   getAllAdmin,
+   getSingleAdmin,
+   updateAdmin,
+   deleteAdmin,
 };
