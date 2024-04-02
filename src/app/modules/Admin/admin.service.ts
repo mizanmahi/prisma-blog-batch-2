@@ -1,4 +1,4 @@
-import { Admin, Prisma } from '@prisma/client';
+import { Admin, Prisma, UserStatus } from '@prisma/client';
 import prisma from '../../../shared/prismaClient';
 import {
    IPaginationParams,
@@ -117,7 +117,7 @@ const deleteAdminFromDB = async (id: string): Promise<Admin> => {
    });
 };
 
-const softDeleteAdminFromDB = async (id: string): Promise<Admin> => {
+const softDeleteAdminFromDB = async (id: string): Promise<Admin | null> => {
    await prisma.admin.findUniqueOrThrow({
       where: {
          id,
@@ -125,13 +125,26 @@ const softDeleteAdminFromDB = async (id: string): Promise<Admin> => {
       },
    });
 
-   return await prisma.admin.update({
-      where: {
-         id,
-      },
-      data: {
-         isDeleted: true,
-      },
+   return await prisma.$transaction(async (trClient) => {
+      const adminDeletedData = await trClient.admin.update({
+         where: {
+            id,
+         },
+         data: {
+            isDeleted: true,
+         },
+      });
+
+      await trClient.user.update({
+         where: {
+            email: adminDeletedData.email,
+         },
+         data: {
+            status: UserStatus.DELETED,
+         },
+      });
+
+      return adminDeletedData;
    });
 };
 
