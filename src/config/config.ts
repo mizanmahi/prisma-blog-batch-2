@@ -1,15 +1,15 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+import path from 'path';
 
-const config = {
-   nodeEnv: process.env.NODE_ENV || 'development',
-   port: process.env.PORT || 5000,
-   databaseUrl: process.env.DATABASE_URL,
+dotenv.config({ path: path.join(process.cwd(), '.env') });
+
+export default {
+   env: process.env.NODE_ENV,
+   port: process.env.PORT,
    jwt: {
-      jwtSecret: process.env.JWT_SECRET,
-      expiresIn: process.env.EXPIRES_IN || '10m',
-      refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-      refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '15d',
+      jwt_secret: process.env.JWT_SECRET,
+      expires_in: process.env.EXPIRES_IN,
+      refresh_token_secret: process.env.REFRESH_TOKEN_SECRET,
+      refresh_token_expires_in: process.env.REFRESH_TOKEN_EXPIRES_IN,
    },
 };
-
-export default config;

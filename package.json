@@ -6,7 +6,8 @@
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
       "start": "node dist/server.js",
-      "build": "tsc"
+      "build": "tsc",
+      "studio": "npx prisma studio"
    },
    "devDependencies": {
       "@types/bcrypt": "^5.0.2",
