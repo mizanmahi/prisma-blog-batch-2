@@ -14,17 +14,3 @@ export class HTTPError extends Error {
       }
    }
 }
-
-function foo() {
-   throw new HTTPError(4500, 'Error in foo function');
-}
-
-function bar() {
-   foo();
-}
-
-try {
-   bar();
-} catch (error: any) {
-   console.error(error.stack);
-}

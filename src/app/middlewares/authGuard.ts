@@ -23,7 +23,10 @@ const authGuard = (...roles: string[]) => {
          );
 
          if (roles.length && !roles.includes(verifiedUser.role)) {
-            throw new Error("You don't have the permission");
+            throw new HTTPError(
+               httpStatus.UNAUTHORIZED,
+               "You don't have the permission"
+            );
          }
 
          req.user = verifiedUser;
