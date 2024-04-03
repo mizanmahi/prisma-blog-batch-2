@@ -1,9 +1,8 @@
+import * as bcrypt from 'bcrypt';
+import { Secret } from 'jsonwebtoken';
 import { UserStatus } from '@prisma/client';
 import prisma from '../../../shared/prismaClient';
 import { jwtHelpers } from '../../../helpers/jwtHelper';
-
-import { Secret } from 'jsonwebtoken';
-import * as bcrypt from 'bcrypt';
 import config from '../../../config/config';
 
 const loginUser = async (payload: { email: string; password: string }) => {

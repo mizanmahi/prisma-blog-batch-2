@@ -3,11 +3,12 @@ import httpStatus from 'http-status';
 
 const globalErrorHandler = (
    err: any,
-   req: Request,
+   _req: Request,
    res: Response,
-   next: NextFunction
+   _next: NextFunction
 ) => {
-   console.dir('came to global error handler', err);
+   console.dir('Came to global error handler');
+   console.log(err.name);
    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: err.message || 'Something went wrong',
