@@ -22,6 +22,8 @@ const authGuard = (...roles: string[]) => {
             config.jwt.jwt_secret as Secret
          );
 
+         console.log({ verifiedUser });
+
          if (roles.length && !roles.includes(verifiedUser.role)) {
             throw new HTTPError(
                httpStatus.UNAUTHORIZED,
