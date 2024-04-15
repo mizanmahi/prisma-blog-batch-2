@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
 import { sendResponse } from '../../../shared/sendResponse';
-import { authServices } from './auth.services';
 import { Request, Response } from 'express';
+import { authServices } from './auth.services';
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
    const result = await authServices.loginUser(req.body);
@@ -35,10 +35,6 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
       success: true,
       message: 'Access token generated successfully!',
       data: result,
-      // data: {
-      //     accessToken: result.accessToken,
-      //     needPasswordChange: result.needPasswordChange
-      // }
    });
 });
 
