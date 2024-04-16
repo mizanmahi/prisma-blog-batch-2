@@ -19,18 +19,20 @@ cloudinary.config({
    api_secret: 'BsXpD1ngFJYBfvlbKcgdPC4wUcc',
 });
 
-const saveToCloudinary = async (file: any) => {
-   let result;
-   cloudinary.uploader.upload(
-      file.path,
-      { public_id: file.originalname },
-      function (error, result) {
-         console.log(result);
-         result = result;
-      }
-   );
-
-   return result;
+const saveToCloudinary = (file: any) => {
+   return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(
+         file.path,
+         { public_id: file.originalname },
+         (error, result) => {
+            if (error) {
+               reject(error);
+            } else {
+               resolve(result);
+            }
+         }
+      );
+   });
 };
 
 export const fileUploader = {
