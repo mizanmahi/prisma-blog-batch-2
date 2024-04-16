@@ -4,11 +4,9 @@ import prisma from '../../../shared/prismaClient';
 import { fileUploader } from '../../../helpers/fileUploader';
 
 const createAdmin = async (req: any): Promise<Admin> => {
-   console.log(req.body);
-
    if (req.file) {
       const uploadedFile = await fileUploader.saveToCloudinary(req.file);
-      req.body.admin.profilePhoto = uploadedFile.secure_url;
+      req.body.admin.profilePhoto = uploadedFile?.secure_url;
    }
 
    const hashedPassword = await bcrypt.hash(req.body.password, 10);
