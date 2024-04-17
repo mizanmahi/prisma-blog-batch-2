@@ -24,7 +24,6 @@ cloudinary.config({
 const saveToCloudinary = (
    file: UploadedFile
 ): Promise<UploadApiResponse | undefined> => {
-   console.log(file);
    return new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
          file.path,

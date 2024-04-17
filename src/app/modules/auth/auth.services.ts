@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import { HTTPError } from '../../errors/HTTPError';
 import httpStatus from 'http-status';
+import { VerifiedUser } from '../../interfaces/common';
 
 const loginUser = async (payload: { email: string; password: string }) => {
    const userData = await prisma.user.findUniqueOrThrow({
@@ -84,7 +85,7 @@ const refreshToken = async (token: string) => {
    };
 };
 
-const changePassword = async (user: any, payload: any) => {
+const changePassword = async (user: VerifiedUser, payload: any) => {
    //@ checking if the user exist
    const userData = await prisma.user.findUniqueOrThrow({
       where: {
@@ -130,9 +131,9 @@ const forgotPassword = async ({ email }: { email: string }) => {
          status: UserStatus.ACTIVE,
       },
    });
-   console.log({ userData });
+
    //@ creating a short time token
-   const resetPasswordToken = await jwtHelpers.generateToken(
+   const resetPasswordToken = jwtHelpers.generateToken(
       {
          email: userData.email,
          role: userData.role,
@@ -151,9 +152,7 @@ const forgotPassword = async ({ email }: { email: string }) => {
    );
 
    const htmlTemplate = fs.readFileSync(htmlFilePath, 'utf8');
-   const htmlContent = htmlTemplate
-      .replace('{{userEmail}}', userData.email)
-      .replace('{{resetPasswordLink}}', link);
+   const htmlContent = htmlTemplate.replace('{{resetPasswordLink}}', link);
 
    await emailSender(userData.email, htmlContent);
 };
