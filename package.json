@@ -7,6 +7,7 @@
       "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
       "start": "node dist/server.js",
       "build": "tsc",
+      "migrate": "npx prisma migrate dev",
       "studio": "npx prisma studio"
    },
    "devDependencies": {
