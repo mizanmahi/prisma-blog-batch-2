@@ -18,7 +18,7 @@ datasource db {
 enum UserRole {
   SUPER_ADMIN
   ADMIN
-  BLOGGER
+  AUTHOR
   MODERATOR
 }
 
