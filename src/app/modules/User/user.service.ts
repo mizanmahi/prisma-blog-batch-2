@@ -2,6 +2,11 @@ import { Admin, Author, UserRole } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import prisma from '../../../shared/prismaClient';
 import { fileUploader } from '../../../helpers/fileUploader';
+import meiliClient, {
+   deleteResourceFromMeili,
+} from '../../../shared/meilisearch';
+const meiliDoctorIndex = meiliClient.index('doctors');
+const meiliAuthorIndex = meiliClient.index('authors');
 
 const createAdmin = async (req: any): Promise<Admin> => {
    if (req.file) {
@@ -21,9 +26,13 @@ const createAdmin = async (req: any): Promise<Admin> => {
       await txClient.user.create({
          data: userData,
       });
-      return await txClient.admin.create({
+      const newAdmin = await txClient.admin.create({
          data: req.body.admin,
       });
+
+      const { id, name, email, profilePhoto } = newAdmin;
+      await meiliDoctorIndex.addDocuments([{ id, name, email, profilePhoto }]);
+      return newAdmin;
    });
 
    return result;
@@ -47,9 +56,16 @@ const createAuthor = async (req: any): Promise<Author> => {
       await txClient.user.create({
          data: userData,
       });
-      return await txClient.author.create({
+      const newAuthor = await txClient.author.create({
          data: req.body.author,
       });
+
+      const { id, name, email, profilePhoto, contactNumber } = newAuthor;
+      meiliAuthorIndex.addDocuments([
+         { id, name, email, profilePhoto, contactNumber },
+      ]);
+
+      return newAuthor;
    });
 
    return result;
