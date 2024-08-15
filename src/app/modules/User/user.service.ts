@@ -28,6 +28,7 @@ const createAdmin = async (req: any): Promise<Admin> => {
 
    return result;
 };
+
 const createAuthor = async (req: any): Promise<Author> => {
    if (req.file) {
       const uploadedFile = await fileUploader.saveToCloudinary(req.file);
@@ -39,7 +40,7 @@ const createAuthor = async (req: any): Promise<Author> => {
    const userData = {
       email: req.body.author.email,
       password: hashedPassword,
-      role: UserRole.BLOGGER,
+      role: UserRole.AUTHOR,
    };
 
    const result = await prisma.$transaction(async (txClient) => {

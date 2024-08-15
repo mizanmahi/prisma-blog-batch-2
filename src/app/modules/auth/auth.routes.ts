@@ -12,7 +12,7 @@ router.post(
    authGuard(
       UserRole.SUPER_ADMIN,
       UserRole.ADMIN,
-      UserRole.BLOGGER,
+      UserRole.AUTHOR,
       UserRole.MODERATOR
    ),
    authController.changePassword

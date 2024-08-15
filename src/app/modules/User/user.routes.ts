@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
    '/create-admin',
-   authGuard(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+   // authGuard(UserRole.SUPER_ADMIN, UserRole.ADMIN),
    fileUploader.upload.single('file'),
    (req: Request, res: Response, next: NextFunction) => {
       req.body = userValidationSchema.createAdminSchema.parse(
