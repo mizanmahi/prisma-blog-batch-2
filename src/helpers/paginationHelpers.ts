@@ -1,12 +1,16 @@
 type IOptions = {
-   page?: number;
-   limit?: number;
+   page?: string;
+   limit?: string;
    sortOrder?: string;
-   sortBy: string;
+   sortBy?: string;
 };
 
-type IOptionsResult = IOptions & {
+type IOptionsResult = {
    skip: number;
+   page: number;
+   limit: number;
+   sortOrder: string;
+   sortBy: string;
 };
 
 export const generatePaginateAndSortOptions = (

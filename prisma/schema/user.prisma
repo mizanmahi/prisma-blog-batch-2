@@ -1,0 +1,70 @@
+model User {
+    id                     String     @id @default(uuid())
+    email                  String     @unique
+    password               String
+    role                   UserRole
+    passwordChangeRequired Boolean    @default(true)
+    status                 UserStatus @default(ACTIVE)
+    createdAt              DateTime   @default(now())
+    updatedAt              DateTime   @updatedAt
+    admin                  Admin?
+    author                 Author?
+    moderator              Moderator?
+
+    @@map("users")
+}
+
+model Admin {
+    id            String   @id @default(uuid())
+    name          String
+    email         String   @unique
+    profilePhoto  String?
+    contactNumber String
+    isDeleted     Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    user          User     @relation(fields: [email], references: [email])
+
+    @@map("admins")
+}
+
+model Author {
+    id            String   @id @default(uuid())
+    name          String
+    email         String   @unique
+    profilePhoto  String?
+    contactNumber String
+    address       String?
+    gender        Gender
+    isDeleted     Boolean  @default(false)
+    bio           String? // Short biography or description of the author
+    website       String? // Personal website URL
+    twitter       String? // Twitter profile URL
+    linkedIn      String? // LinkedIn profile URL
+    facebook      String? // Facebook profile URL
+    language      String? // Primary language of the author
+    education     String? // Educational background
+    experience    String? // Work experience or professional achievements
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    user    User      @relation(fields: [email], references: [email])
+    blog    Blog[]
+    Comment Comment[]
+}
+
+model Moderator {
+    id            String   @id @default(uuid())
+    name          String
+    email         String   @unique
+    profilePhoto  String?
+    contactNumber String
+    address       String?
+    gender        Gender
+    isDeleted     Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    user          User     @relation(fields: [email], references: [email])
+
+    @@map("moderators")
+}

@@ -1,0 +1,27 @@
+model Blog {
+    id         String     @id @default(uuid())
+    title      String
+    content    String
+    coverImage String?
+    authorId   String
+    author     Author     @relation(fields: [authorId], references: [id])
+    visibility Visibility @default(PUBLIC)
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+    comment    Comment[]
+
+    @@map("blogs")
+}
+
+model Comment {
+    id        String   @id @default(uuid())
+    content   String
+    authorId  String
+    author    Author   @relation(fields: [authorId], references: [id])
+    blogId    String
+    blog      Blog     @relation(fields: [blogId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("comments")
+}
