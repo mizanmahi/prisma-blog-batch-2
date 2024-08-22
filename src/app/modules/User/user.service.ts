@@ -61,7 +61,7 @@ const createAuthor = async (req: any): Promise<Author> => {
       });
 
       const { id, name, email, profilePhoto, contactNumber } = newAuthor;
-      meiliAuthorIndex.addDocuments([
+      await meiliAuthorIndex.addDocuments([
          { id, name, email, profilePhoto, contactNumber },
       ]);
 

@@ -3,9 +3,10 @@ import path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import fs from 'fs';
 import { UploadedFile } from '../app/interfaces/file';
+import config from '../config/config';
 
 const storage = multer.diskStorage({
-   destination: function (req, file, cb) {
+   destination: function (_req, _file, cb) {
       cb(null, path.join(process.cwd(), '/uploads'));
    },
    filename: function (req, file, cb) {
@@ -17,8 +18,8 @@ const upload = multer({ storage: storage });
 
 cloudinary.config({
    cloud_name: 'mizan-ph',
-   api_key: '448877366715569',
-   api_secret: 'BsXpD1ngFJYBfvlbKcgdPC4wUcc',
+   api_key: config.cloudinary_api_key,
+   api_secret: config.cloudinary_api_secret,
 });
 
 const saveToCloudinary = (
