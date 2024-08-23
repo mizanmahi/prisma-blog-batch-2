@@ -10,11 +10,18 @@ const storage = multer.diskStorage({
       cb(null, path.join(process.cwd(), '/uploads'));
    },
    filename: function (req, file, cb) {
-      cb(null, file.originalname);
+      // Remove spaces, add a hyphen, and append a timestamp
+      const sanitizedFilename = file.originalname.replace(/\s+/g, '-');
+      const timestamp = Date.now();
+      const filename = `${sanitizedFilename}-${timestamp}${path.extname(
+         file.originalname
+      )}`;
+      cb(null, filename);
    },
 });
 
-const upload = multer({ storage: multer.memoryStorage() });
+// const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage });
 
 cloudinary.config({
    cloud_name: 'mizan-ph',
