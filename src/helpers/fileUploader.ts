@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
    },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 cloudinary.config({
    cloud_name: 'mizan-ph',

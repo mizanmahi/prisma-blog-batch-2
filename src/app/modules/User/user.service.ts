@@ -5,37 +5,39 @@ import { fileUploader } from '../../../helpers/fileUploader';
 import meiliClient, {
    deleteResourceFromMeili,
 } from '../../../shared/meilisearch';
+import uploadImageS3 from '../../../helpers/s3Uploader';
 const meiliDoctorIndex = meiliClient.index('doctors');
 const meiliAuthorIndex = meiliClient.index('authors');
 
 const createAdmin = async (req: any): Promise<Admin> => {
    if (req.file) {
-      const uploadedFile = await fileUploader.saveToCloudinary(req.file);
-      req.body.admin.profilePhoto = uploadedFile?.secure_url;
+      // const uploadedFile = await fileUploader.saveToCloudinary(req.file);
+      const uploadedFile = await uploadImageS3(req.file);
+      // req.body.admin.profilePhoto = uploadedFile?.secure_url;
    }
 
-   const hashedPassword = await bcrypt.hash(req.body.password, 10);
+   // const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-   const userData = {
-      email: req.body.admin.email,
-      password: hashedPassword,
-      role: UserRole.ADMIN,
-   };
+   // const userData = {
+   //    email: req.body.admin.email,
+   //    password: hashedPassword,
+   //    role: UserRole.ADMIN,
+   // };
 
-   const result = await prisma.$transaction(async (txClient) => {
-      await txClient.user.create({
-         data: userData,
-      });
-      const newAdmin = await txClient.admin.create({
-         data: req.body.admin,
-      });
+   // const result = await prisma.$transaction(async (txClient) => {
+   //    await txClient.user.create({
+   //       data: userData,
+   //    });
+   //    const newAdmin = await txClient.admin.create({
+   //       data: req.body.admin,
+   //    });
 
-      const { id, name, email, profilePhoto } = newAdmin;
-      await meiliDoctorIndex.addDocuments([{ id, name, email, profilePhoto }]);
-      return newAdmin;
-   });
+   //    const { id, name, email, profilePhoto } = newAdmin;
+   //    await meiliDoctorIndex.addDocuments([{ id, name, email, profilePhoto }]);
+   //    return newAdmin;
+   // });
 
-   return result;
+   return 'ok';
 };
 
 const createAuthor = async (req: any): Promise<Author> => {

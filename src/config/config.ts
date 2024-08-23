@@ -19,4 +19,7 @@ export default {
    app_password: process.env.APP_PASSWORD,
    cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
+   aws_access_key_id: process.env.AWS_ACCESS_KEY_ID,
+   aws_secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
+   aws_region: process.env.AWS_REGION,
 };
