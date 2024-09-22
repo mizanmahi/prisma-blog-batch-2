@@ -20,7 +20,8 @@ const uploadImageS3 = async (file: UploadedFile) => {
    try {
       const result = await s3Client.send(new PutObjectCommand(params));
       const uploadUrl = `https://${config.aws_bucket_name}.s3.${config.aws_region}.amazonaws.com/${file.filename}`;
-      console.log({ result, uploadUrl });
+      // console.log({ result, uploadUrl });
+      return uploadUrl;
    } catch (err) {
       console.error(err);
    }

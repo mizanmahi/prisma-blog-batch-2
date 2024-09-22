@@ -11,9 +11,10 @@ const meiliAuthorIndex = meiliClient.index('authors');
 
 const createAdmin = async (req: any): Promise<Admin> => {
    if (req.file) {
+      const uploadedFileUrl = await uploadImageS3(req.file);
       // const uploadedFile = await fileUploader.saveToCloudinary(req.file);
-      const uploadedFile = await uploadImageS3(req.file);
-      req.body.admin.profilePhoto = uploadedFile;
+      // req.body.admin.profilePhoto = uploadedFile?.secure_url;
+      req.body.admin.profilePhoto = uploadedFileUrl;
    }
 
    const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -33,7 +34,7 @@ const createAdmin = async (req: any): Promise<Admin> => {
       });
 
       const { id, name, email, profilePhoto } = newAdmin;
-      await meiliDoctorIndex.addDocuments([{ id, name, email, profilePhoto }]);
+      // await meiliDoctorIndex.addDocuments([{ id, name, email, profilePhoto }]);
       return newAdmin;
    });
 
