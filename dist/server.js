@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
-const PORT = 5000;
+const config_1 = __importDefault(require("./config/config"));
 let server;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        server = app_1.default.listen(PORT, () => {
-            console.log(`🚀 Server ready at: http://localhost:${PORT} and the process id is ${process.pid}`);
+        server = app_1.default.listen(config_1.default.port, () => {
+            console.log(`🚀 Server ready at: http://localhost:${config_1.default.port} and the process id is ${process.pid}`);
         });
     });
 }
@@ -34,7 +34,7 @@ const exitHandler = () => {
     }
 };
 const unexpectedErrorHandler = (error) => {
-    console.error(error);
+    console.log(error);
     exitHandler();
 };
 process.on('uncaughtException', unexpectedErrorHandler);

@@ -8,7 +8,7 @@ const uploadImageS3 = async (file: UploadedFile) => {
    console.log(file);
 
    const fileBuffer = fs.readFileSync(file.path);
-   console.log(fileBuffer);
+   // console.log(fileBuffer);
 
    // Upload file to S3
    const params = {
