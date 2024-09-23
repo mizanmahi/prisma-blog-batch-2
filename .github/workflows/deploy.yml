@@ -41,7 +41,7 @@ jobs:
               port: 22
               script: |
                  # Pull the latest image
-                 sudo docker pull ${{ secrets.DOCKERHUB_USER_NAME }}/nextbog:1.0
+                 sudo docker pull ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0
 
                  # Check if the container is running and stop/remove it if it exists
                  if [ "$(sudo docker ps -q -f name=nextblog)" ]; then
@@ -52,4 +52,4 @@ jobs:
 
                  # Run the container
                  echo "Starting a new container..."
-                 sudo docker run -d --name nextblog -p 80:80 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0
+                 sudo docker run -d --name nextblog -p 5000:5000 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0
