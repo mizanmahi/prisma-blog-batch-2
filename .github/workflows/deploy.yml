@@ -1,0 +1,55 @@
+name: Build, Push, and Deploy Docker Image to EC2
+
+on:
+   push:
+      branches:
+         - main # Trigger the workflow on push to the main branch
+
+jobs:
+   build_and_deploy:
+      runs-on: ubuntu-latest
+
+      steps:
+         # Step 1: Checkout the code
+         - name: Checkout code
+           uses: actions/checkout@v3
+
+         # Step 2: Log in to DockerHub
+         - name: Log in to DockerHub
+           uses: docker/login-action@v2
+           with:
+              username: ${{ secrets.DOCKERHUB_USER_NAME }}
+              password: ${{ secrets.DOCKERHUB_TOEKN }}
+
+         # Step 3: Build the Docker image
+         - name: Build Docker image
+           run: |
+              docker build -t ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0 .
+
+         # Step 4: Push Docker image to DockerHub
+         - name: Push Docker image
+           run: |
+              docker push ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0
+
+         # Step 5: SSH to EC2 and deploy the Docker container
+         - name: Deploy to EC2
+           uses: appleboy/ssh-action@v1.0.3
+           with:
+              host: ${{ secrets.EC2_HOST }}
+              username: ${{ secrets.EC2_USER_NAME }}
+              key: ${{ secrets.EC2_SSH }}
+              port: 22
+              script: |
+                 # Pull the latest image
+                 sudo docker pull ${{ secrets.DOCKERHUB_USER_NAME }}/nextbog:1.0
+
+                 # Check if the container is running and stop/remove it if it exists
+                 if [ "$(sudo docker ps -q -f name=nextblog)" ]; then
+                   echo "Stopping and removing existing container..."
+                   sudo docker stop nextblog
+                   sudo docker rm nextblog
+                 fi
+
+                 # Run the container
+                 echo "Starting a new container..."
+                 sudo docker run -d --name nextblog -p 80:80 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:1.0
