@@ -19,7 +19,7 @@ const fs_1 = __importDefault(require("fs"));
 const uploadImageS3 = (file) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(file);
     const fileBuffer = fs_1.default.readFileSync(file.path);
-    console.log(fileBuffer);
+    // console.log(fileBuffer);
     // Upload file to S3
     const params = {
         Bucket: config_1.default.aws_bucket_name,
