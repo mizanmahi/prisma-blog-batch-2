@@ -52,7 +52,7 @@ jobs:
 
                  # creating env file from secret
                  cd /homes/${{secrets.EC2_USER_NAME}}
-                 echo ${{secrets.APP_ENVS}} > .env
+                 echo "${{ secrets.APP_ENVS }}" > .env
                  cat .env
 
                  # Run the container
