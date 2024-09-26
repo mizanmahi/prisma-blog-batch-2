@@ -50,6 +50,11 @@ jobs:
                    sudo docker rm nextblog
                  fi
 
+                 # creating env file from secret
+                 cd /homes/${{secrets.EC2_USER_NAME}}
+                 echo ${{secrets.APP_ENVS}} > .env
+                 cat .env
+
                  # Run the container
                  echo "Starting a new container..."
-                 sudo docker run -d --name nextblog -p 9000:5000 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:2.0
+                 sudo docker run -d --name nextblog --env-file .env -p 9000:5000 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:2.0
