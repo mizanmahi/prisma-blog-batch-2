@@ -3,7 +3,8 @@ name: Build, Push, and Deploy Docker Image to EC2
 on:
    push:
       branches:
-         - main # Trigger the workflow on push to the main branch
+         - main
+         - dev # Trigger the workflow on push to the dev branch
 
 jobs:
    build_and_deploy:
@@ -24,12 +25,12 @@ jobs:
          # Step 3: Build the Docker image
          - name: Build Docker image
            run: |
-              docker build -t ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:3.0 .
+              docker build -t ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:7.0 .
 
          # Step 4: Push Docker image to DockerHub
          - name: Push Docker image
            run: |
-              docker push ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:3.0
+              docker push ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:7.0
 
          # Step 5: SSH to EC2 and deploy the Docker container
          - name: Deploy to EC2
@@ -41,7 +42,7 @@ jobs:
               port: 22
               script: |
                  # Pull the latest image
-                 sudo docker pull ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:3.0
+                 sudo docker pull ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:7.0
 
                  # Check if the container is running and stop/remove it if it exists
                  if [ "$(sudo docker ps -a -q -f name=nextblog)" ]; then
@@ -57,4 +58,4 @@ jobs:
 
                  # Run the container
                  echo "Starting a new container..."
-                 sudo docker run -d --name nextblog --env-file .env -p 9000:5000 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:3.0
+                 sudo docker run -d --name nextblog --env-file .env -p 9000:5000 ${{ secrets.DOCKERHUB_USER_NAME }}/nextblog:7.0
