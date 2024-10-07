@@ -4,7 +4,7 @@ import {
    IPaginationParams,
    ISortingParams,
 } from '../../interfaces/paginationSorting';
-import { IUserFilterParams } from '../userssss/user.interface';
+import { IUserFilterParams } from '../user/user.interface';
 import { generatePaginateAndSortOptions } from '../../../helpers/paginationHelpers';
 import { searchableFields } from './admin.constants';
 
